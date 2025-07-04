@@ -1,0 +1,27 @@
+
+  {
+    "build": {
+      "preview": {
+        "distribution": "internal",
+        "android": {
+          "proguardRules": "proguard-rules.pro",
+          "buildType": "apk",
+          "gradleCommand": ":app:assembleRelease",
+          "env": {
+            "EXPO_USE_HERMES": "1"
+          }
+        }
+      },
+      "production": {
+        "distribution": "store",
+        "android": {
+          "proguardRules": "proguard-rules.pro",
+          "buildType": "aab",
+          "gradleCommand": ":app:assembleRelease",
+          "env": {
+            "EXPO_USE_HERMES": "1"
+          }
+        }
+      }
+    }
+  }
