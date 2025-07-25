@@ -7,3 +7,5 @@ masher
 # masher/android
 
 ecosystem.config.js
+masher2/node_modules
+masher2/.env
