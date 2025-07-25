@@ -109,7 +109,7 @@ Use Redis caching to minimize DB queries.
 
 <!-- app -->
 
-Use fast image for images
+Use fast image lib for images
 use various optimization techniques for faster app and ui
 memoize components with props
 remove unnecessary console.logs

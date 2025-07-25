@@ -27,14 +27,12 @@ Some screeenshots and video giving below of my mobile chat app-
 
 <!-- Send log in to access data from every route if user is not found (if necessary) to log out from app -->
 
-issues-
-navigation pages are reloading data when mounting but components are loading data each time they mounted
 
-so i have to use redux to save data in state without loading the data again and again.
+use redux to save data in state without loading the data again and again.
 
 # Comment console.log because it reduces performance
 
-First complete then optimize and break into smaller components and use redux when necessary
+<!-- First complete then optimize and break into smaller components and use redux when necessary
 
 socket io with redis - A+
 after deleting conversation, it is not coming when messaging next time - B
@@ -43,16 +41,16 @@ updating user data - C
 notifications page - C
 formik and error in create login and other inputs - C
 resolve errors after login and signup - A
-breaking into small components
+breaking into small components -->
 
 
-Mongodb data directory is at # Where and how to store data.
+<!-- Mongodb data directory is at # Where and how to store data.
 storage:
   dbPath: C:\Program Files\MongoDB\Server\8.0\data
 
   i can change it
 
-I am using mongodb as service
+I am using mongodb as service -->
 
 # first complete application then check all console.logs and other to check if something is running twice or not efficient
 

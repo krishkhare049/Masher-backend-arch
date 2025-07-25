@@ -1,7 +1,6 @@
 does watermelon db alows sync to database
 
 
-ChatGPT said:
 Yes, WatermelonDB allows syncing with a database, but it does not come with built-in sync functionality. Instead, you need to manually implement sync by integrating it with your backend using APIs.
 
 ✅ How WatermelonDB Sync Works
@@ -111,7 +110,6 @@ Would you like help setting up the backend for sync? 😊
 what is the limit of whatsapp backup
 
 
-ChatGPT said:
 The WhatsApp backup limit depends on the platform:
 
 ✅ Google Drive (Android)

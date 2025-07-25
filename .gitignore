@@ -9,3 +9,7 @@ masher
 ecosystem.config.js
 masher2/node_modules
 masher2/.env
+
+presentation.md
+revenue_model.md
+production.md
