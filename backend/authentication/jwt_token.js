@@ -29,7 +29,7 @@ const verifyToken = async (token) => {
     try {
         // console.log("Token: ", token);
         // const decodejwt = await jwt.verify(token, JWT_secret_key);
-        const decodejwt = await jwt.verify(token, "khareindustries_krishkhare_masher_backend_407", function (err, decode){
+        const decodejwt = await jwt.verify(token, JWT_secret_key, function (err, decode){
             if(err){
                 console.log(err);
                 // console.log("Error while decoding jwt");
@@ -49,14 +49,6 @@ const verifyToken = async (token) => {
     }
 
 };
-
-// Checking time taken-
-// console.time();
-// createToken({ _id: '630357977c9cf96d4552bd8a', name: 'Krish Khare' });
-// createToken({ _id: '630357977c9cf96d4552bd8a', name: 'Krish Khare', random_id: random_five_digit() });
-// verifyToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjYzMDM1Nzk3N2M5Y2Y5NmQ0NTUyYmQ4YSIsIm5hbWUiOiJLcmlzaCBLaGFyZSJ9LCJpYXQiOjE2OTc2Mjk4NjN9.8PxeOLhFdTHw8mJ2vWuoQtgP2H7RnPzeeg9wfUC_6Ec");
-// console.timeEnd();
-
 module.exports = {
     createToken, verifyToken
 };

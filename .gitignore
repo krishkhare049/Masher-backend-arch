@@ -13,3 +13,5 @@ masher2/.env
 presentation.md
 revenue_model.md
 production.md
+
+*.pem
