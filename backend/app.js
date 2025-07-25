@@ -1,6 +1,6 @@
 // Configuring environment variables
 // require('dotenv').config()
-require('dotenv').config(); // Importing dotenv
+// require('dotenv').config(); // Importing dotenv
 
 // Connect with database
 require('./config/database').connect();
@@ -17,6 +17,7 @@ const authRoutes = require('./routes/authRoutes'); // Importing auth routes
 const userRoutes = require('./routes/userRoutes'); // Importing user routes
 const messageRoutes = require('./routes/messageRoutes'); // Importing message routes
 const conversationRoutes = require('./routes/conversationRoutes'); // Importing conversation routes
+const uploadRoutes = require('./routes/s3uploadRoutes'); // Importing conversation routes
 const {restrict_to_logged_in} = require('./middlewares/restrict_to_logged_in'); // Importing restrict middleware
 
 const app = express(); // Creating an instance of express
@@ -68,7 +69,7 @@ const whitelist = [
 
 let corsOptions = {
     origin: function (origin, callback) {
-          console.log("Request Origin:", origin)
+        //   console.log("Request Origin:", origin)
         if (whitelist.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         } else {
@@ -106,6 +107,9 @@ app.use('/api/messages', restrict_to_logged_in, messageRoutes);
 
 // Use conversations routes (Protected)
 app.use('/api/conversations', restrict_to_logged_in, conversationRoutes);
+
+// Use conversations routes (Protected)
+app.use('/api/uploads', restrict_to_logged_in, uploadRoutes);
 
 // Export app to server.js
 module.exports = app; // Exporting the app

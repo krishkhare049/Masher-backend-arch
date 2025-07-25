@@ -381,33 +381,32 @@ Let me know if you want to also add file deletion logs or handle access() using 
 
 <!-- Functionalities need to create- -->
 Home search,
-Anonymous chat
-Search mic
-Customization
-Privacy
-Payments
-Change password
-Blocked
-Security
-parent message
-long click
+Anonymous chat - not for now
+Customization - done
+Privacy - not for now
+Payments - not for now
+Change password - done
+Blocked - not for now
+Security - not for now
+parent message - not for now
+long click - X
 
 <!-- today- -->
 conversation model change - done
-leave group and second admin
-add and remove particpants
+leave group and second admin - done
+add and remove particpants - done
 user profile description and update only if changed
 group desc and rules page
 
 <!-- yester -->
-change password
+change password - done
 realtime messaging, online users - done
 network, error handling like leaving grp when user offline or failed
 search mic
 optimize
 
 <!-- 24 -->
-launch on aws, m0
+launch on aws, m0 - done
 reddit post, linkedin etc
 generate full production build and test
 
@@ -427,3 +426,25 @@ Therefore from eas production aab after splitting actual masher size can be arou
 use timestamp cursor instead of skip- more efficient, consistent - changing all skip query in backend
 
 play console address verification - pnb bank statement within recent 3 months - latest month to last month
+
+
+group socket message to all members
+redis - check
+
+# post to linkedin & twitter & reddit
+
+e2ee
+ota
+notifications
+
+# publish on google play store
+# shoot demo one for online awareness and one for clg friends and linkedIn to approach them for testing
+# first tell them to send their email and i will send them link and then tell them to test it
+# then as they use add more features they like and after the app is published, add admob and then keep ads minimal and give offers like customization, blue tick, stickers etc
+
+# Ads - stories (btw video ads or something)
+
+<!-- Dont show ads on testing version -->
+
+<!-- Remember in India - I just need to earn 10 Rs per user and in US android only in starting i need to earn nearly 30-40 Rs. -->
+<!-- Once i get more than 100k users and if i find out that tier1 countries are generating more revenue than india or tier3 countries i may temporarily shut from tier 3 countries -->

@@ -29,8 +29,10 @@ async function addMessage(req, res) {
     let conversation = await Conversation.findOne(
       {
         isGroup: isGroup,
-        "participants.user": { $all: participantIds },
-        $expr: { $eq: [{ $size: "$participants" }, participantIds.length] },
+        // "participants.user": { $all: participantIds },
+        // $expr: { $eq: [{ $size: "$participants" }, participantIds.length] },
+        participantIds: { $all: participantIds, $size: 2 },
+
       },
       {
         _id: 1,
@@ -54,6 +56,7 @@ async function addMessage(req, res) {
 
       const newConversation = new Conversation({
         participants: participantObjects,
+        participantIds: participantIds,
         lastMessage: content,
         isGroup: isGroup,
         unreadMessagesCount: 1,
@@ -170,7 +173,9 @@ async function addMessageToGroup(req, res) {
 
     const recipients = conversation.participants.filter(
       (participant) => participant.user.toString() !== sender.toString()
-    );
+    ).map((participant) => participant.user);
+
+    console.log("Recipients: ", recipients);
 
     // Save the new message
     const currentMessage = new Message({
@@ -193,10 +198,12 @@ async function addMessageToGroup(req, res) {
       conversation: conversation,
       // message: currentMessage,
       message: savedMessage,
+      type: 'group_messages'
     };
 
     // Publish message to Redis
-    pubClient.publish("chat_messages", JSON.stringify(data));
+    // pubClient.publish("chat_messages", JSON.stringify(data));
+    pubClient.publish("group_events", JSON.stringify(data));
 
     res.send("message_added_successfully");
   } catch (error) {

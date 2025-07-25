@@ -1,0 +1,92 @@
+{
+  "expo": {
+    "name": "Masher",
+    "slug": "masher2",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icons/masher.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/masher.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION"
+      ],
+      "edgeToEdgeEnabled": false,
+      "usesCleartextTraffic": true,
+      "package": "com.krishkhare.masher",
+
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "favicon": "./assets/icons/masher.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#fdbe00",
+          "image": "./assets/icons/masherlogo2.png",
+          "width": 200
+        }
+      ],
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-1527554410089535~2753231743",
+          "iosAppId": "ca-app-pub-xxxxxxxx~yyyyyyyyyy"
+        }
+      ],
+      "expo-secure-store",
+      "expo-font",
+      ["expo-audio", 
+      {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+       [
+        "expo-notifications",
+        {
+          "icon": "./assets/icons/masherlogo2.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "sounds": [
+            "./assets/sounds/longpop.wav"
+          ],
+          "enableBackgroundRemoteNotifications": true
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "78e79818-3225-4831-9af3-bf7ae4442c5c"
+      }
+    },
+    "owner": "krish_khare"
+  }
+}

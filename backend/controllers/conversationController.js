@@ -79,12 +79,18 @@ const constants = require("fs").constants;
 async function getConversationAllMessages(req, res) {
   try {
     const userId = new mongoose.Types.ObjectId(req.user_id);
-    const conversationId = new mongoose.Types.ObjectId(req.params.conversationId);
+    const conversationId = new mongoose.Types.ObjectId(
+      req.params.conversationId
+    );
     const limit = 50;
 
     // Dual cursor: createdAt and _id
-    const cursorDate = req.query.before ? new Date(req.query.before) : new Date();
-    const cursorId = req.query.lastId ? new mongoose.Types.ObjectId(req.query.lastId) : null;
+    const cursorDate = req.query.before
+      ? new Date(req.query.before)
+      : new Date();
+    const cursorId = req.query.lastId
+      ? new mongoose.Types.ObjectId(req.query.lastId)
+      : null;
 
     // Cursor logic
     const matchCondition = {
@@ -109,24 +115,27 @@ async function getConversationAllMessages(req, res) {
       isSender: msg.sender.toString() === userId.toString(),
     }));
 
-    const nextCursor = formattedMessages.length > 0
-      ? {
-          before: formattedMessages[formattedMessages.length - 1].createdAt.toISOString(),
-          lastId: formattedMessages[formattedMessages.length - 1]._id.toString(),
-        }
-      : null;
+    const nextCursor =
+      formattedMessages.length > 0
+        ? {
+            before:
+              formattedMessages[
+                formattedMessages.length - 1
+              ].createdAt.toISOString(),
+            lastId:
+              formattedMessages[formattedMessages.length - 1]._id.toString(),
+          }
+        : null;
 
     res.json({
       messages: formattedMessages,
       nextCursor,
     });
-
   } catch (error) {
     console.error("Error fetching conversation messages:", error);
     res.status(500).send("error_occurred");
   }
 }
-
 
 // FIX THIS-
 // FIX THIS-
@@ -134,26 +143,41 @@ async function getConversationAllMessages(req, res) {
 async function getConversationAllMessagesByParticipants(req, res) {
   try {
     const userId = new mongoose.Types.ObjectId(req.user_id);
-    const otherParticipantId = new mongoose.Types.ObjectId(req.params.otherParticipantId);
+    const otherParticipantId = new mongoose.Types.ObjectId(
+      req.params.otherParticipantId
+    );
     const limit = 50;
 
-    // Dual cursor
-    const cursorDate = req.query.before ? new Date(req.query.before) : new Date();
-    const cursorId = req.query.lastId ? new mongoose.Types.ObjectId(req.query.lastId) : null;
+    console.log('Conversation by other participants')
+    console.log(req.query.before, req.query.lastId)
 
-    const participants = [userId, otherParticipantId];
+    // Dual cursor
+    const cursorDate = req.query.before
+      ? new Date(req.query.before)
+      : new Date();
+    const cursorId = req.query.lastId
+      ? new mongoose.Types.ObjectId(req.query.lastId)
+      : null;
+
+    const participantIds = [userId, otherParticipantId];
+
+    console.log(participantIds)
 
     const conversation = await Conversation.findOne(
       {
-        participants: { $all: participants, $size: 2 },
         isGroup: false,
+        participantIds: { $all: participantIds, $size: 2 },
       },
       { _id: 1 }
     );
 
     if (!conversation) {
+      console.log('no_conversation_yet')
       return res.send("no_conversation_yet");
     }
+
+    console.log(conversation)
+
 
     const conversationId = conversation._id;
 
@@ -183,8 +207,12 @@ async function getConversationAllMessagesByParticipants(req, res) {
     const nextCursor =
       formattedMessages.length > 0
         ? {
-            before: formattedMessages[formattedMessages.length - 1].createdAt.toISOString(),
-            lastId: formattedMessages[formattedMessages.length - 1]._id.toString(),
+            before:
+              formattedMessages[
+                formattedMessages.length - 1
+              ].createdAt.toISOString(),
+            lastId:
+              formattedMessages[formattedMessages.length - 1]._id.toString(),
           }
         : null;
 
@@ -198,13 +226,18 @@ async function getConversationAllMessagesByParticipants(req, res) {
   }
 }
 
-
 async function createNewGroup(req, res) {
   try {
     const creator = req.user_id;
-    const file = req.file ? req.file.filename : "default_group_icon";
+    const file = req.body.imageKey ? req.body.imageKey : "default_group_icon";
     const groupName = req.body.groupName.trim();
-    const groupDescription = req.body.groupDescription.trim();
+    const groupDescription = req.body.groupDescription.trim() || "";
+    const recipients = req.body.recipients ;
+
+    if (!groupName || !Array.isArray(recipients)) {
+      return res.status(400).json({ message: "Missing required fields." });
+    }
+
     // const groupIcon = req.body.groupIcon;
     // const groupIcon = file.filename; // store path or URL;
     // console.log('file')
@@ -221,7 +254,6 @@ async function createNewGroup(req, res) {
 
     const adminsApproveMembers = req.body.adminsApproveMembers === "true";
     const editPermissionsMembers = req.body.editPermissionsMembers === "true";
-    const recipients = JSON.parse(req.body.recipients);
 
     // const participants = [...new Set([...recipients, creator])]; // Ensuring uniqueness
 
@@ -721,14 +753,15 @@ async function exitGroup(req, res) {
   }
 }
 
-
 async function removeParticipantFromGroup(req, res) {
   try {
     const user_id = req.user_id;
     const { participantId, conversationId } = req.body;
 
     if (!participantId || !conversationId) {
-      return res.status(400).json({ message: "Participant ID and Conversation ID are required." });
+      return res
+        .status(400)
+        .json({ message: "Participant ID and Conversation ID are required." });
     }
 
     // Step 1: Fetch the conversation and check if user_id is admin
@@ -741,7 +774,9 @@ async function removeParticipantFromGroup(req, res) {
     const isTargetUserAdmin = conversation.admins.includes(participantId);
 
     if (!isRequestingUserAdmin) {
-      return res.status(403).json({ message: "Only admins can remove participants." });
+      return res
+        .status(403)
+        .json({ message: "Only admins can remove participants." });
     }
 
     if (isTargetUserAdmin) {
@@ -818,7 +853,11 @@ async function addParticipantsToGroup(req, res) {
     const user_id = req.user_id;
     const { participantIds, conversationId } = req.body;
 
-    if (!Array.isArray(participantIds) || participantIds.length === 0 || !conversationId) {
+    if (
+      !Array.isArray(participantIds) ||
+      participantIds.length === 0 ||
+      !conversationId
+    ) {
       return res.status(400).json({
         message: "Participant IDs (as array) and Conversation ID are required.",
       });
@@ -861,7 +900,8 @@ async function addParticipantsToGroup(req, res) {
     await conversation.save();
 
     return res.json({
-      message: `participants_added_successfully`});
+      message: `participants_added_successfully`,
+    });
   } catch (error) {
     console.error("addParticipantsToGroup error:", error);
     return res.status(500).json({ message: "error_occurred" });
@@ -891,7 +931,10 @@ async function demoteMeFromAdmin(req, res) {
     const participants = conversation.participants || [];
 
     // Check if the user is the only participant
-    if (participants.length === 1 && participants[0].user.toString() === user_id) {
+    if (
+      participants.length === 1 &&
+      participants[0].user.toString() === user_id
+    ) {
       return res.status(403).json({
         message: "You are the only participant in the group. Cannot demote.",
       });
@@ -921,7 +964,8 @@ async function demoteMeFromAdmin(req, res) {
       });
 
       return res.json({
-        message: "You were the only admin. Another participant has been promoted and you have been demoted.",
+        message:
+          "You were the only admin. Another participant has been promoted and you have been demoted.",
       });
     }
 
@@ -939,7 +983,6 @@ async function demoteMeFromAdmin(req, res) {
   }
 }
 
-
 module.exports = {
   getConversationAllMessages,
   getConversationAllMessagesByParticipants,
@@ -952,5 +995,5 @@ module.exports = {
   exitGroup,
   removeParticipantFromGroup,
   addParticipantsToGroup,
-  demoteMeFromAdmin
+  demoteMeFromAdmin,
 }; // Exporting the functions

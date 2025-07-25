@@ -320,9 +320,17 @@ const { sendDirectMessageToSocket } = require("./utils/sendDirectMessageToSocket
 const { getReceiverSocketId } = require("./utils/getReceiverSocketId");
 const sendOnlineUpdateToFriends = require("./utils/sendOnlineUpdateToFriends");
 const { setIO } = require("./ioManager");
+const { getReceiverSocketIdList } = require("./utils/getReceiverSocketIdList");
+const { sendPushNotification, sendPushNotificationsToMultipleUsers } = require("./utils/pushService");
+const { getMessageSenderData } = require("../backend/utils/getMessageSenderData");
+const { connect } = require("../backend/config/database");
 
 // const express = require("express");
 // const app = express();
+// require('dotenv').config();
+
+// 🔥 Call only once at startup
+require("../backend/config/database").connect()
 
 
 const server = http.createServer();
@@ -366,17 +374,100 @@ subClient.on("message", async (channel, message) => {
   try {
     const data = JSON.parse(message);
 
+    // console.log("📨 Broadcasting message:", data);
     if (channel === "chat_messages") {
-      console.log("📨 Broadcasting message:", data);
 
       const recipientSockets = await getReceiverSocketId(data.message.recipients[0]);
       const senderSockets = await getReceiverSocketId(data.message.sender);
+        // console.log("Sender Sockets: ", senderSockets);
 
-      sendDirectMessageToSocket("new_message", recipientSockets, data);
+        // console.log("Recipient sockets: ", recipientSockets)
+
+      if(recipientSockets && recipientSockets.length > 0){ 
+        sendDirectMessageToSocket("new_message", recipientSockets, data);
+      }
+      else{
+        // Send notification to the receiver if they are not online
+
+        // console.log('sending not to recipient')
+        // console.log('Sender Id: ', data.message.sender)
+
+        // Create a function-
+        const messageSenderData = await getMessageSenderData(data.message.sender);
+
+        // console.log(messageSenderData)
+
+        sendPushNotification(data.message.recipients[0], `${messageSenderData.full_name} messaged you`, messageSenderData.profile_image_filename.filename, data.message.content, {type: 'new_message_dm', conversationId: data.message.conversationId})
+      }
+
+      console.log('sending to sender')
+      if(senderSockets && senderSockets.length > 0){
+
       sendDirectMessageToSocket("my_new_message", senderSockets, data);
-    } else if (channel === "group_events" && data.type === "group_created") {
-      const memberSockets = await getReceiverSocketIdList(data.data.members);
-      sendDirectMessageToSocket("group_created", memberSockets, data.data);
+      }
+      // else{
+      //   // Send notification to the sender if they are not online
+      // }
+
+    // } else if (channel === "group_events" && data.type === "group_created") {
+    } else if (channel === "group_events") {
+      if(data.type === "group_created"){
+
+        const memberSockets = await getReceiverSocketIdList(data.message.recipients);
+        const foundSocketIds = memberSockets.foundSocketIds;
+        const notFoundUserIds = memberSockets.notFoundUserIds;
+
+      if(foundSocketIds && foundSocketIds.length > 0){
+        sendDirectMessageToSocket("group_created", foundSocketIds, data);
+      }
+
+      const getGroupCreatorData = '';
+
+      // TODO- 
+   if(notFoundUserIds && notFoundUserIds.length > 0){
+        // Send push notification to all those ids that now they have been added to group-
+sendPushNotificationsToMultipleUsers(notFoundUserIds, `${data.conversation.groupName} has a new message`, data.conversation.groupIcon.filename, `${getGroupCreatorData.full_name} added you to ${data.conversation.groupName}`, {type: 'added_to_new_group', groupId: ''})
+
+      }
+
+      }
+      else if (data.type === 'group_messages'){
+        // console.log('Conversation data: ')
+        // console.log(data)
+        // console.log(data.message.recipients);
+        const senderSockets = await getReceiverSocketId(data.message.sender);
+
+        if(senderSockets && senderSockets.length > 0){
+          sendDirectMessageToSocket("my_new_group_message", senderSockets, data);
+        }
+
+        // console.log("Sender Sockets: ", senderSockets);
+        const recipientsSockets = await getReceiverSocketIdList(data.message.recipients);
+        // console.log("Recipients Sockets: ", recipientsSockets);
+
+        const foundSocketIds = recipientsSockets.foundSocketIds;
+        const notFoundUserIds = recipientsSockets.notFoundUserIds;
+      if(foundSocketIds && foundSocketIds.length > 0){
+        // console.log(foundSocketIds)
+
+        sendDirectMessageToSocket("new_group_message", foundSocketIds, data);
+      }
+
+      // Check for each of recipients who are not online and send them a notification
+      if(notFoundUserIds && notFoundUserIds.length > 0){
+        // Send push notification to all those ids-
+
+        // console.log(notFoundUserIds)
+
+        sendPushNotificationsToMultipleUsers(notFoundUserIds, `${data.conversation.groupName} has a new message`, data.conversation.groupIcon.filename, data.message.content, {type: 'new_group_msg', conversationId: data.message.conversationId})
+
+      }
+
+
+      }
+    }
+    else if(channel === "user_events"){
+      // For user events like notifications, or etc...
     }
   } catch (err) {
     console.error(`❌ Error handling Redis message from ${channel}:`, err);
@@ -455,16 +546,22 @@ io.on("connection", async (socket) => {
   }
 
   socket.on("userTyping", async (data) => {
+    console.log('Send to recipient that user is typing' + data.sendToOtherUser)
     const sockets = await getReceiverSocketId(data.sendToOtherUser);
+      if(sockets && sockets.length > 0){
     sendDirectMessageToSocket("displayTyping", sockets, { username: data.username });
+      }
   });
 
   socket.on("userStoppedTyping", async (data) => {
     const sockets = await getReceiverSocketId(data.sendToOtherUser);
+      if(sockets && sockets.length > 0){
+
     sendDirectMessageToSocket("hideTyping", sockets, {
       userId,
       sendToOtherUser: data.sendToOtherUser,
     });
+  }
   });
 
   socket.on("disconnect", async () => {

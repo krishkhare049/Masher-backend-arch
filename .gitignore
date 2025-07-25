@@ -1,5 +1,7 @@
 backend/node_modules
+backend/.env
 chat/node_modules
+chat/.env
 # masher/node_modules
 masher
 # masher/android

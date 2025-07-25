@@ -40,6 +40,8 @@ const { getIO } = require("../ioManager.js"); // Assuming you have a function to
 
 async function sendDirectMessageToSocket(eventName, socketIds, data) {
   const io = getIO();
+
+  console.log(eventName, socketIds);
   if (!eventName || !Array.isArray(socketIds) || socketIds.length === 0 || !data) {
     console.warn("sendDirectMessageToSocket: Invalid input.");
     return;

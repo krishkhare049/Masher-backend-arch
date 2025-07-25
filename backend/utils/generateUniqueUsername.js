@@ -10,7 +10,7 @@ async function generateUniqueUsername(fullName) {
 
     // Check if the username exists in the database
     while (true) {
-        const existingUser  = await User.findOne({ username });
+        const existingUser  = await User.findOne({ username }, {_id: 1});
         if (!existingUser ) {
             // Username is unique, return it
             return username;

@@ -9,6 +9,9 @@ const conversationSchema = new Schema(
       addedAt: { type: Date, default: Date.now },
     },
   ],
+  participantIds: [{
+    type: Schema.Types.ObjectId, ref: 'User'
+  }],
     lastMessage: { type: String },
     isGroup: { type: Boolean, default: false },
     adminsApproveMembers: { type: Boolean, default: true },
@@ -39,7 +42,7 @@ const conversationSchema = new Schema(
 // Create an index. currently its not working
 // conversationSchema.createIndex({ participants: 1 });
 conversationSchema.index({ participants: 1 });
-conversationSchema.index({ participants: 1, isGroup: 1 });
+conversationSchema.index({ participantIds: 1, isGroup: 1 });
 // conversationSchema.index({ isGroup: 1 });
 conversationSchema.index({ updatedAt: -1 });
 

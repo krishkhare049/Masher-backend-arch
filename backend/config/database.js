@@ -22,6 +22,8 @@ const mongoose = require('mongoose');
 
 const { MONGO_URI } = process.env;
 
+mongoose.set("strictQuery", true);
+
 let isConnected = false; // Track connection state
 
 async function connect() {
@@ -29,6 +31,7 @@ async function connect() {
         console.log("✅ Database already connected. Reusing connection.");
         return ;
     }
+
 
     try {
         await mongoose.connect(MONGO_URI, {

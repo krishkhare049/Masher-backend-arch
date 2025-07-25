@@ -110,6 +110,11 @@ notifications: [
         },
       },
     ],
+    expoPushToken: {
+      type: String,
+      default: null, // Default value is null if no token is set
+      unique: true // Ensure each user has a unique token
+    }
   },
   { timestamps: true }
 );

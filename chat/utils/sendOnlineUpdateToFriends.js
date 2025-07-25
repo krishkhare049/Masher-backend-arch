@@ -30,18 +30,25 @@ const { getReceiverSocketId } = require("./getReceiverSocketId");
 
 async function sendOnlineUpdateToFriends({ userId, status }) {
   try {
+
+    console.log('Sending update to friends')
+
     const io = getIO();
     
     const participants = await getConversationFriends(userId);
+
+    console.log('Conversation friends: ', participants)
     if (!participants || participants.length === 0) return;
 
     for (let i = 0; i < participants.length; i++) {
       const participant = participants[i];
 
-      const participantSocketIds = await getReceiverSocketId(participant._id);
+      const participantSocketIds = await getReceiverSocketId(participant.otherParticipantId);
       if (!participantSocketIds || participantSocketIds.length === 0) continue;
 
       const eventName = status === "online" ? "user_online" : "user_offline";
+
+      console.log('Event name: ', eventName)
 
       participantSocketIds.forEach((socketId) => {
         io.to(socketId).emit(eventName, participant);

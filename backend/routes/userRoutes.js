@@ -4,7 +4,9 @@ const userController = require('../controllers/userController');
 const {upload_profile_img} = require('../middlewares/profile_image_mw')
 
 
+router.get('/homeinfo', userController.homeinfo)
 router.get('/getUserConversations', userController.getUserConversations)
+
 // router.get('/searchUserByName/:text/:skip', userController.searchUserByName)
 
 router.get('/searchUserByName/:text', userController.searchUserByName)
@@ -19,6 +21,7 @@ router.get('/getUserData', userController.getUserData)
 router.get('/getOtherUserData/:otherUserId', userController.getOtherUserData)
 router.post('/updateUserDetails', userController.updateUserDetails)
 router.post('/updateUsername', userController.updateUsername)
+router.post('/updatePassword', userController.updatePassword)
 router.post('/uploadProfileImage', upload_profile_img.single("fileData"), userController.uploadProfileImage)
 router.post('/removeProfileImage', userController.removeProfileImage)
 
@@ -32,5 +35,6 @@ router.post('/deleteAllNotifications', userController.deleteAllNotifications)
 
 router.get('/getOnlineUsers', userController.getOnlineUsers)
 
+router.post('/registerPushToken', userController.registerPushToken)
 
 module.exports = router;

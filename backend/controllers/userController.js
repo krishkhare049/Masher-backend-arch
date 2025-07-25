@@ -13,8 +13,12 @@ const {
 const generateUniqueUsername = require("../utils/generateUniqueUsername");
 const { getConversationFriends } = require("../utils/getConversationFriends");
 const { pubClient } = require("../../chat/config/redisClient");
-const { once } = require("events");
 const Conversation = require("../models/conversationModel");
+
+const { hash, compare } = require("bcrypt");
+
+const saltRounds = 10;
+
 // const { filterOnlineParticipants } = require("../utils/filterOnlineParticipants");
 
 // Get user conversations
@@ -317,7 +321,7 @@ async function getUserConversations(req, res) {
         }
       : null;
 
-      console.log(userConversations);
+      // console.log(userConversations);
     res.json({
       conversations: userConversations,
       nextCursor,
@@ -931,6 +935,44 @@ async function updateUsername(req, res) {
     res.send("error_occurred");
   }
 }
+// Update password
+// This is not used in frontend, only used in settings page to change password
+ const updatePassword = async (req, res) => {
+  try {
+    const user_id = req.user_id;
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      return res.status(400).send("missing_fields");
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).send("passwords_do_not_match");
+    }
+
+    const user = await User.findById(user_id);
+
+    if (!user) {
+      return res.status(404).send("user_not_found");
+    }
+
+    const isMatch = await compare(oldPassword, user.user_password);
+
+    if (!isMatch) {
+      return res.status(401).send("incorrect_old_password");
+    }
+
+    const hashedPassword = await hash(newPassword, saltRounds);
+
+    user.user_password = hashedPassword;
+    await user.save();
+
+    res.send("password_updated_successfully");
+  } catch (error) {
+    console.error("Password update error:", error);
+    res.status(500).send("server_error");
+  }
+};
 
 async function uploadProfileImage(req, res) {
   try {
@@ -1309,6 +1351,55 @@ async function getOnlineUsers(req, res) {
   }
 }
 
+async function homeinfo(req, res) {
+  res.json({
+    message: 'Hello from masher! This is the home info endpoint. - Krish Khare',
+  })
+}
+
+// Register push token function
+async function registerPushToken(req, res) {
+    try {
+        const token = req.body.token;
+        const userId = req.user_id;
+
+        console.log('Registering token: ', token)
+
+        const user = await User.findOne(
+            { _id: userId },
+            { expoPushToken: 1 }
+
+        );
+        // console.log(user);
+
+        if (user) {
+            // Check if the token already exists
+            // if (user.expoPushToken && user.expoPushToken.includes(token)) {
+            //     return res.json({ token: 'already_registered', message: 'token_already_registered' });
+            // }
+
+            // Add the new token to the array
+            const updatedUser = await User.updateOne(
+                {_id: userId },
+                { $set: { expoPushToken: token } }
+            );
+
+            if (updatedUser.modifiedCount > 0) {
+              console.log('Token registered')
+                res.json({ token: 'registered', message: 'token_registered_successfully' });
+            } else {
+                res.json({ token: 'not_updated', message: 'token_not_updated' });
+            }
+        } else {
+            res.json({ message: 'user_not_found' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({ message: 'user_not_found' });
+    }
+}
+
+
 module.exports = {
   getUserConversations,
 
@@ -1324,6 +1415,7 @@ module.exports = {
   getOtherUserData,
   updateUserDetails,
   updateUsername,
+  updatePassword,
   uploadProfileImage,
   removeProfileImage,
 
@@ -1333,6 +1425,10 @@ module.exports = {
   deleteAllNotifications,
 
   getOnlineUsers,
+
+  homeinfo,
+
+  registerPushToken
 }; // Exporting the functions
 
 // i want to find a array
